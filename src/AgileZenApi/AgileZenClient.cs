@@ -1,10 +1,22 @@
-﻿using AgileZenApi.Resources;
+﻿using AgileZenApi.Models;
+using AgileZenApi.Resources;
 using RestSharp;
 
 namespace AgileZenApi
 {
     public class AgileZenClient
     {
+        public PhasesResource Phases { get; private set; }
+
+        public Project Project
+        {
+            set
+            {
+                Stories.Project = value;
+                Tags.Project = value;
+            }
+        }
+
         public ProjectsResource Projects { get; private set; }
 
         public StoriesResource Stories { get; private set; }
@@ -19,6 +31,7 @@ namespace AgileZenApi
             client.AddDefaultHeader("Content-Type", "application/json");
             client.AddDefaultHeader("Accept", "application/json");
 
+            Phases = new PhasesResource(client);
             Projects = new ProjectsResource(client);
             Stories = new StoriesResource(client);
             Tags = new TagsResource(client);

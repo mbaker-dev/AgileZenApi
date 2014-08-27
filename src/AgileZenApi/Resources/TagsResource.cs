@@ -10,13 +10,9 @@ namespace AgileZenApi.Resources
     /// </summary>
     public class TagsResource : AgileZenResource
     {
-        private readonly RestClient _client;
-
-        public Project Project { get; set; }
-
         public TagsResource(RestClient client)
+            : base(client)
         {
-            _client = client;
         }
 
         protected override RestRequest CreateRequest(Method method, string uri = "")

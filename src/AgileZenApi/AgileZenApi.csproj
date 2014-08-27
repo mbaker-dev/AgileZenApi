@@ -57,6 +57,7 @@
     <Compile Include="PagedResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\AgileZenResource.cs" />
+    <Compile Include="Resources\PhasesResource.cs" />
     <Compile Include="Resources\ProjectsResource.cs" />
     <Compile Include="Resources\StoriesResource.cs" />
     <Compile Include="Resources\TagsResource.cs" />

@@ -1,44 +1,36 @@
-﻿using System.Threading.Tasks;
-using AgileZenApi.Models;
+﻿using AgileZenApi.Models;
 using RestSharp;
 
 namespace AgileZenApi.Resources
 {
-    public class StoriesResource
+    public class StoriesResource : AgileZenResource
     {
-        private readonly RestClient _client;
-
         public StoriesResource(RestClient client)
+            : base(client)
         {
-            _client = client;
         }
 
-        public Story Create(Story story)
+        protected override RestRequest CreateRequest(Method method, string uri = "")
         {
-            var request = new RestRequest("Projects/{projectId}/Stories", Method.POST);
-            request.RequestFormat = DataFormat.Json;
-            request.AddUrlSegment("projectId", story.Project.Id.ToString());
+            var request = base.CreateRequest(method, "projects/{projectId}/stories/" + uri);
+            request.AddUrlSegment("projectId", Project.Id.ToString());
+
+            return request;
+        }
+
+        public ApiResponse<Story> Create(Story story)
+        {
+            var request = CreateRequest(Method.POST);
             request.AddBody(story);
 
-            return _client.Execute<Story>(request).Data;
+            var response = _client.Execute<Story>(request);
+
+            return new ApiResponse<Story> { Item = response.Data, StatusCode = response.StatusCode };
         }
 
-        public async Task<Story> CreateAsync(Story story)
+        public PagedResponse<Story> List(string projectId, int page = 1, int pageSize = 100, string filter = null)
         {
-            var request = new RestRequest("Projects/{projectId}/Stories", Method.POST);
-            request.RequestFormat = DataFormat.Json;
-            request.AddUrlSegment("projectId", story.Project.Id.ToString());
-            request.AddBody(story);
-
-            var response = await _client.ExecuteTaskAsync<Story>(request);
-
-            return response.Data;
-        }
-
-        public ApiResponse<Story> List(string projectId, int page = 1, int pageSize = 100, string filter = null)
-        {
-            var request = new RestRequest("Projects/{projectId}/Stories", Method.GET);
-            request.AddUrlSegment("projectId", projectId);
+            var request = CreateRequest(Method.GET);
             request.AddParameter("page", page);
             request.AddParameter("pageSize", pageSize);
 
@@ -47,23 +39,14 @@ namespace AgileZenApi.Resources
                 request.AddParameter("where", filter);
             }
 
-            return _client.Execute<ApiResponse<Story>>(request).Data;
-        }
+            var response = _client.Execute<PagedResponse<Story>>(request);
 
-        public async Task<ApiResponse<Story>> ListAsync(string projectId, int page = 1, int pageSize = 100, string filter = null)
-        {
-            var request = new RestRequest("Projects/{projectId}/Stories", Method.GET);
-            request.AddUrlSegment("projectId", projectId);
-            request.AddParameter("page", page);
-            request.AddParameter("pageSize", pageSize);
-
-            if (filter != null)
+            if (response.Data == null)
             {
-                request.AddParameter("where", filter);
+                return new PagedResponse<Story> { StatusCode = response.StatusCode };
             }
 
-            var response = await _client.ExecuteTaskAsync<ApiResponse<Story>>(request);
-
+            response.Data.StatusCode = response.StatusCode;
             return response.Data;
         }
     }

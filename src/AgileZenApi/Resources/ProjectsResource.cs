@@ -4,27 +4,51 @@ using RestSharp;
 
 namespace AgileZenApi.Resources
 {
-    public class ProjectsResource
+    public class ProjectsResource : AgileZenResource
     {
-        private readonly RestClient _client;
-
         public ProjectsResource(RestClient client)
+            : base(client)
         {
-            _client = client;
         }
 
-        public ApiResponse<Project> List()
+        protected override RestRequest CreateRequest(Method method, string uri = "")
         {
-            var request = new RestRequest("Projects", Method.GET);
+            var request = base.CreateRequest(method, "projects/" + uri);
 
-            return _client.Execute<ApiResponse<Project>>(request).Data;
+            return request;
         }
 
-        public async Task<ApiResponse<Project>> ListAsync()
+        public PagedResponse<Project> List(int page = 1, int pageSize = 100)
         {
-            var request = new RestRequest("Projects", Method.GET);
-            var response = await _client.ExecuteTaskAsync<ApiResponse<Project>>(request);
+            var request = CreateRequest(Method.GET);
+            request.AddParameter("page", page);
+            request.AddParameter("pageSize", pageSize);
 
+            var response = _client.Execute<PagedResponse<Project>>(request);
+
+            if (response.Data == null)
+            {
+                return new PagedResponse<Project> { StatusCode = response.StatusCode };
+            }
+
+            response.Data.StatusCode = response.StatusCode;
+            return response.Data;
+        }
+
+        public async Task<PagedResponse<Project>> ListAsync(int page = 1, int pageSize = 100)
+        {
+            var request = CreateRequest(Method.GET);
+            request.AddParameter("page", page);
+            request.AddParameter("pageSize", pageSize);
+
+            var response = await _client.ExecuteTaskAsync<PagedResponse<Project>>(request);
+
+            if (response.Data == null)
+            {
+                return new PagedResponse<Project> { StatusCode = response.StatusCode };
+            }
+
+            response.Data.StatusCode = response.StatusCode;
             return response.Data;
         }
     }
