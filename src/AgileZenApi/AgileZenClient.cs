@@ -12,6 +12,7 @@ namespace AgileZenApi
         {
             set
             {
+                Phases.Project = value;
                 Stories.Project = value;
                 Tags.Project = value;
             }
