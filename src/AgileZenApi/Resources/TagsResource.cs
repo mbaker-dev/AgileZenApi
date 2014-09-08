@@ -23,6 +23,15 @@ namespace AgileZenApi.Resources
             return request;
         }
 
+        /// <summary>
+        /// Adds an EXISTING tag to a story.
+        /// </summary>
+        /// <param name="tag">The tag to add to the story. The tag must already exist.</param>
+        /// <param name="story">The story to add the tag to.</param>
+        /// <returns>
+        ///     Funny story: we return a single story, which happens to be the first story with the passed in tag.
+        ///     Basically the Agile Zen API accepts a single tag/story but returns a list of stories with the tag.
+        /// </returns>
         public ApiResponse<Story> AddToStory(Tag tag, Story story)
         {
             var request = CreateRequest(Method.POST, "{tag}/stories");
@@ -45,9 +54,7 @@ namespace AgileZenApi.Resources
             var request = CreateRequest(Method.POST);
             request.AddBody(tag);
 
-            var response = _client.Execute<Tag>(request);
-
-            return new ApiResponse<Tag> { Item = response.Data, StatusCode = response.StatusCode };
+            return CreateApiResponse(_client.Execute<Tag>(request));
         }
 
         public ApiResponse<Tag> Delete(Tag tag)
@@ -65,8 +72,7 @@ namespace AgileZenApi.Resources
             var request = CreateRequest(Method.GET, "{tag}");
             request.AddUrlSegment("tag", tag.Name);
 
-            var response = _client.Execute<Tag>(request);
-            return new ApiResponse<Tag> { Item = response.Data, StatusCode = response.StatusCode };
+            return CreateApiResponse(_client.Execute<Tag>(request));
         }
 
         public PagedResponse<Tag> List(int page = 1, int pageSize = 100)
@@ -75,15 +81,7 @@ namespace AgileZenApi.Resources
             request.AddParameter("page", page);
             request.AddParameter("pageSize", pageSize);
 
-            var response = _client.Execute<PagedResponse<Tag>>(request);
-
-            if (response.Data == null)
-            {
-                return new PagedResponse<Tag> { StatusCode = response.StatusCode };
-            }
-
-            response.Data.StatusCode = response.StatusCode;
-            return response.Data;
+            return CreatePagedResponse(_client.Execute<PagedResponse<Tag>>(request));
         }
 
         public PagedResponse<Story> ListStories(Tag tag, int page = 1, int pageSize = 100)
@@ -93,15 +91,7 @@ namespace AgileZenApi.Resources
             request.AddParameter("page", page);
             request.AddParameter("pageSize", pageSize);
 
-            var response = _client.Execute<PagedResponse<Story>>(request);
-
-            if (response.Data == null)
-            {
-                return new PagedResponse<Story> { StatusCode = response.StatusCode };
-            }
-
-            response.Data.StatusCode = response.StatusCode;
-            return response.Data;
+            return CreatePagedResponse(_client.Execute<PagedResponse<Story>>(request));
         }
 
         public ApiResponse<Tag> RemoveFromStory(Tag tag, Story story)
@@ -138,9 +128,7 @@ namespace AgileZenApi.Resources
             request.AddUrlSegment("tag", tag.Id.ToString());
             request.AddBody(tag);
 
-            var response = _client.Execute<Tag>(request);
-
-            return new ApiResponse<Tag> { Item = response.Data, StatusCode = response.StatusCode };
+            return CreateApiResponse(_client.Execute<Tag>(request));
         }
     }
 }
