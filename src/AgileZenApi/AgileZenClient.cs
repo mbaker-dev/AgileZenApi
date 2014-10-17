@@ -18,6 +18,8 @@ namespace AgileZenApi
             }
         }
 
+        public MeResource Me { get; private set; }
+
         public ProjectsResource Projects { get; private set; }
 
         public StoriesResource Stories { get; private set; }
@@ -32,6 +34,7 @@ namespace AgileZenApi
             client.AddDefaultHeader("Content-Type", "application/json");
             client.AddDefaultHeader("Accept", "application/json");
 
+            Me = new MeResource(client);
             Phases = new PhasesResource(client);
             Projects = new ProjectsResource(client);
             Stories = new StoriesResource(client);

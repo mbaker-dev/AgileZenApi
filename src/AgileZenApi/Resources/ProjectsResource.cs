@@ -18,6 +18,50 @@ namespace AgileZenApi.Resources
             return request;
         }
 
+        public ApiResponse<Project> Get(Project project)
+        {
+            var request = CreateRequest(Method.GET, "{projectID}");
+            request.AddUrlSegment("projectID", project.Id.ToString());
+
+            var response = _client.Execute<Project>(request);
+
+            return CreateApiResponse(response);
+        }
+
+        public async Task<ApiResponse<Project>> GetAsync(Project project)
+        {
+            var request = CreateRequest(Method.GET, "{projectID}");
+            request.AddUrlSegment("projectID", project.Id.ToString());
+
+            var response = await _client.ExecuteTaskAsync<Project>(request);
+
+            return CreateApiResponse(response);
+        }
+
+        public PagedResponse<User> GetMembers(Project project, int page = 1, int pageSize = 100)
+        {
+            var request = CreateRequest(Method.GET, "{projectID}/members");
+            request.AddUrlSegment("projectID", project.Id.ToString());
+            request.AddParameter("page", page);
+            request.AddParameter("pageSize", pageSize);
+
+            var response = _client.Execute<PagedResponse<User>>(request);
+
+            return CreatePagedResponse(response);
+        }
+
+        public async Task<PagedResponse<User>> GetMembersAsync(Project project, int page = 1, int pageSize = 100)
+        {
+            var request = CreateRequest(Method.GET, "{projectID}/members");
+            request.AddUrlSegment("projectID", project.Id.ToString());
+            request.AddParameter("page", page);
+            request.AddParameter("pageSize", pageSize);
+
+            var response = await _client.ExecuteTaskAsync<PagedResponse<User>>(request);
+
+            return CreatePagedResponse(response);
+        }
+
         public PagedResponse<Project> List(int page = 1, int pageSize = 100)
         {
             var request = CreateRequest(Method.GET);
@@ -26,13 +70,7 @@ namespace AgileZenApi.Resources
 
             var response = _client.Execute<PagedResponse<Project>>(request);
 
-            if (response.Data == null)
-            {
-                return new PagedResponse<Project> { StatusCode = response.StatusCode };
-            }
-
-            response.Data.StatusCode = response.StatusCode;
-            return response.Data;
+            return CreatePagedResponse(response);
         }
 
         public async Task<PagedResponse<Project>> ListAsync(int page = 1, int pageSize = 100)
@@ -43,13 +81,7 @@ namespace AgileZenApi.Resources
 
             var response = await _client.ExecuteTaskAsync<PagedResponse<Project>>(request);
 
-            if (response.Data == null)
-            {
-                return new PagedResponse<Project> { StatusCode = response.StatusCode };
-            }
-
-            response.Data.StatusCode = response.StatusCode;
-            return response.Data;
+            return CreatePagedResponse(response);
         }
     }
 }
