@@ -69,7 +69,7 @@ namespace AgileZenApi.Resources
             return CreatePagedResponse(_client.Execute<PagedResponse<Tag>>(request));
         }
 
-        public PagedResponse<Story> List(string projectId, int page = 1, int pageSize = 100, string filter = null)
+        public PagedResponse<Story> List(int page = 1, int pageSize = 100, string filter = null, bool withTags = false)
         {
             var request = CreateRequest(Method.GET);
             request.AddParameter("page", page);
@@ -78,6 +78,11 @@ namespace AgileZenApi.Resources
             if (filter != null)
             {
                 request.AddParameter("where", filter);
+            }
+
+            if (withTags)
+            {
+                request.AddParameter("with", "tags");
             }
 
             return CreatePagedResponse(_client.Execute<PagedResponse<Story>>(request));
